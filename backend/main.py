@@ -7,7 +7,10 @@ import io
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://ai-data-analytics-geneereator.vercel.app/analyze"
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
