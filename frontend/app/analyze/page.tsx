@@ -50,8 +50,8 @@ localStorage.setItem('analysisData', JSON.stringify(result))
         <FileUpload
           file={file}
           loading={loading}
-          onFileChange={(f) => setFile(f)}
-          onAnalyze={handleAnalyzeData}
+          onFileChangeAction={(f) => setFile(f)}
+          onAnalyzeAction={handleAnalyzeData}
         />
       </div>
     </div>
