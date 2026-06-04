@@ -46,3 +46,13 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Analysis
+ * 
+ */
+export type Analysis = Prisma.AnalysisModel
+/**
+ * Model Chat
+ * 
+ */
+export type Chat = Prisma.ChatModel
