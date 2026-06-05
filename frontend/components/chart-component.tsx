@@ -19,7 +19,7 @@ interface ChartComponentProps {
   type: 'bar' | 'line' | 'pie'
   data: {
     title: string
-    explanation: string
+    explanation?: string
     x: (string | number)[]
     y: number[]
     x_label: string

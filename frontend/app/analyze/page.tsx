@@ -467,6 +467,7 @@ export default function ChatPage() {
                                                         {msg.chart.title}
                                                     </p>
                                                     <ChartComponent
+                                                    
                                                         type={msg.chart.type}
                                                         data={msg.chart}
                                                         height={200}
