@@ -18,7 +18,8 @@ interface Message {
     chart?: {
         show: boolean
         type: 'bar' | 'line' | 'pie'
-        title: string
+        title: string,
+         explanation: '',
         x: (string | number)[]
         y: number[]
         x_label: string
