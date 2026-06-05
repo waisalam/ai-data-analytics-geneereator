@@ -5,6 +5,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { NextResponse } from 'next/server'
 
 
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
@@ -13,9 +14,21 @@ export async function POST(request: Request) {
         const dbUser = await prisma.user.findUnique({
   where: { email: session.user.email! }
 })
+const user = await prisma.user.findUnique({
+  where:{email: session.user.email!},
+  include: { _count: { select: { analyses: true } } }
+})
 
+if(user?.plan === 'free' && user._count.analyses >= 2){
+   return NextResponse.json(
+    { message: 'Free tier limit reached. Upgrade to upload more files.' },
+    { status: 403 }
+  )
+}
 
 if (!dbUser) return NextResponse.json({ message: 'User not found' }, { status: 404 })
+
+
 
     const formData = await request.formData()
     const file = formData.get('file') as File

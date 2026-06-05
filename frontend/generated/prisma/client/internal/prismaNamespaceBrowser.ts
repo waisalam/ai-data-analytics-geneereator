@@ -79,6 +79,7 @@ export const UserScalarFieldEnum = {
   password: 'password',
   verified: 'verified',
   otp: 'otp',
+  plan: 'plan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -103,7 +104,8 @@ export const ChatScalarFieldEnum = {
   analysisId: 'analysisId',
   question: 'question',
   answer: 'answer',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  chartData: 'chartData'
 } as const
 
 export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]

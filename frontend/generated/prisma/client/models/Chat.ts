@@ -30,6 +30,7 @@ export type ChatMinAggregateOutputType = {
   question: string | null
   answer: string | null
   createdAt: Date | null
+  chartData: string | null
 }
 
 export type ChatMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type ChatMaxAggregateOutputType = {
   question: string | null
   answer: string | null
   createdAt: Date | null
+  chartData: string | null
 }
 
 export type ChatCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type ChatCountAggregateOutputType = {
   question: number
   answer: number
   createdAt: number
+  chartData: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type ChatMinAggregateInputType = {
   question?: true
   answer?: true
   createdAt?: true
+  chartData?: true
 }
 
 export type ChatMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type ChatMaxAggregateInputType = {
   question?: true
   answer?: true
   createdAt?: true
+  chartData?: true
 }
 
 export type ChatCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type ChatCountAggregateInputType = {
   question?: true
   answer?: true
   createdAt?: true
+  chartData?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type ChatGroupByOutputType = {
   question: string
   answer: string
   createdAt: Date
+  chartData: string | null
   _count: ChatCountAggregateOutputType | null
   _min: ChatMinAggregateOutputType | null
   _max: ChatMaxAggregateOutputType | null
@@ -182,6 +189,7 @@ export type ChatWhereInput = {
   question?: Prisma.StringFilter<"Chat"> | string
   answer?: Prisma.StringFilter<"Chat"> | string
   createdAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
+  chartData?: Prisma.StringNullableFilter<"Chat"> | string | null
   analysis?: Prisma.XOR<Prisma.AnalysisScalarRelationFilter, Prisma.AnalysisWhereInput>
 }
 
@@ -191,6 +199,7 @@ export type ChatOrderByWithRelationInput = {
   question?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  chartData?: Prisma.SortOrderInput | Prisma.SortOrder
   analysis?: Prisma.AnalysisOrderByWithRelationInput
 }
 
@@ -203,6 +212,7 @@ export type ChatWhereUniqueInput = Prisma.AtLeast<{
   question?: Prisma.StringFilter<"Chat"> | string
   answer?: Prisma.StringFilter<"Chat"> | string
   createdAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
+  chartData?: Prisma.StringNullableFilter<"Chat"> | string | null
   analysis?: Prisma.XOR<Prisma.AnalysisScalarRelationFilter, Prisma.AnalysisWhereInput>
 }, "id">
 
@@ -212,6 +222,7 @@ export type ChatOrderByWithAggregationInput = {
   question?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  chartData?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ChatCountOrderByAggregateInput
   _max?: Prisma.ChatMaxOrderByAggregateInput
   _min?: Prisma.ChatMinOrderByAggregateInput
@@ -226,6 +237,7 @@ export type ChatScalarWhereWithAggregatesInput = {
   question?: Prisma.StringWithAggregatesFilter<"Chat"> | string
   answer?: Prisma.StringWithAggregatesFilter<"Chat"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Chat"> | Date | string
+  chartData?: Prisma.StringNullableWithAggregatesFilter<"Chat"> | string | null
 }
 
 export type ChatCreateInput = {
@@ -233,6 +245,7 @@ export type ChatCreateInput = {
   question: string
   answer: string
   createdAt?: Date | string
+  chartData?: string | null
   analysis: Prisma.AnalysisCreateNestedOneWithoutChatsInput
 }
 
@@ -242,6 +255,7 @@ export type ChatUncheckedCreateInput = {
   question: string
   answer: string
   createdAt?: Date | string
+  chartData?: string | null
 }
 
 export type ChatUpdateInput = {
@@ -249,6 +263,7 @@ export type ChatUpdateInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysis?: Prisma.AnalysisUpdateOneRequiredWithoutChatsNestedInput
 }
 
@@ -258,6 +273,7 @@ export type ChatUncheckedUpdateInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ChatCreateManyInput = {
@@ -266,6 +282,7 @@ export type ChatCreateManyInput = {
   question: string
   answer: string
   createdAt?: Date | string
+  chartData?: string | null
 }
 
 export type ChatUpdateManyMutationInput = {
@@ -273,6 +290,7 @@ export type ChatUpdateManyMutationInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ChatUncheckedUpdateManyInput = {
@@ -281,6 +299,7 @@ export type ChatUncheckedUpdateManyInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ChatListRelationFilter = {
@@ -299,6 +318,7 @@ export type ChatCountOrderByAggregateInput = {
   question?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  chartData?: Prisma.SortOrder
 }
 
 export type ChatMaxOrderByAggregateInput = {
@@ -307,6 +327,7 @@ export type ChatMaxOrderByAggregateInput = {
   question?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  chartData?: Prisma.SortOrder
 }
 
 export type ChatMinOrderByAggregateInput = {
@@ -315,6 +336,7 @@ export type ChatMinOrderByAggregateInput = {
   question?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  chartData?: Prisma.SortOrder
 }
 
 export type ChatCreateNestedManyWithoutAnalysisInput = {
@@ -364,6 +386,7 @@ export type ChatCreateWithoutAnalysisInput = {
   question: string
   answer: string
   createdAt?: Date | string
+  chartData?: string | null
 }
 
 export type ChatUncheckedCreateWithoutAnalysisInput = {
@@ -371,6 +394,7 @@ export type ChatUncheckedCreateWithoutAnalysisInput = {
   question: string
   answer: string
   createdAt?: Date | string
+  chartData?: string | null
 }
 
 export type ChatCreateOrConnectWithoutAnalysisInput = {
@@ -408,6 +432,7 @@ export type ChatScalarWhereInput = {
   question?: Prisma.StringFilter<"Chat"> | string
   answer?: Prisma.StringFilter<"Chat"> | string
   createdAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
+  chartData?: Prisma.StringNullableFilter<"Chat"> | string | null
 }
 
 export type ChatCreateManyAnalysisInput = {
@@ -415,6 +440,7 @@ export type ChatCreateManyAnalysisInput = {
   question: string
   answer: string
   createdAt?: Date | string
+  chartData?: string | null
 }
 
 export type ChatUpdateWithoutAnalysisInput = {
@@ -422,6 +448,7 @@ export type ChatUpdateWithoutAnalysisInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ChatUncheckedUpdateWithoutAnalysisInput = {
@@ -429,6 +456,7 @@ export type ChatUncheckedUpdateWithoutAnalysisInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ChatUncheckedUpdateManyWithoutAnalysisInput = {
@@ -436,6 +464,7 @@ export type ChatUncheckedUpdateManyWithoutAnalysisInput = {
   question?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chartData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -446,6 +475,7 @@ export type ChatSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   question?: boolean
   answer?: boolean
   createdAt?: boolean
+  chartData?: boolean
   analysis?: boolean | Prisma.AnalysisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
@@ -455,6 +485,7 @@ export type ChatSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   question?: boolean
   answer?: boolean
   createdAt?: boolean
+  chartData?: boolean
   analysis?: boolean | Prisma.AnalysisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
@@ -464,6 +495,7 @@ export type ChatSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   question?: boolean
   answer?: boolean
   createdAt?: boolean
+  chartData?: boolean
   analysis?: boolean | Prisma.AnalysisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
@@ -473,9 +505,10 @@ export type ChatSelectScalar = {
   question?: boolean
   answer?: boolean
   createdAt?: boolean
+  chartData?: boolean
 }
 
-export type ChatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "analysisId" | "question" | "answer" | "createdAt", ExtArgs["result"]["chat"]>
+export type ChatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "analysisId" | "question" | "answer" | "createdAt" | "chartData", ExtArgs["result"]["chat"]>
 export type ChatInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   analysis?: boolean | Prisma.AnalysisDefaultArgs<ExtArgs>
 }
@@ -497,6 +530,7 @@ export type $ChatPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     question: string
     answer: string
     createdAt: Date
+    chartData: string | null
   }, ExtArgs["result"]["chat"]>
   composites: {}
 }
@@ -926,6 +960,7 @@ export interface ChatFieldRefs {
   readonly question: Prisma.FieldRef<"Chat", 'String'>
   readonly answer: Prisma.FieldRef<"Chat", 'String'>
   readonly createdAt: Prisma.FieldRef<"Chat", 'DateTime'>
+  readonly chartData: Prisma.FieldRef<"Chat", 'String'>
 }
     
 

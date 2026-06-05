@@ -29,18 +29,27 @@ interface ChartComponentProps {
 }
 
 const COLORS = [
-  '#f97316', '#60a5fa', '#34d399', '#fbbf24',
-  '#818cf8', '#f472b6', '#06b6d4', '#a78bfa',
+  '#f97316',
+  '#fb923c',
+  '#ea580c',
+  '#fdba74',
+  '#fed7aa',
+  '#c2410c',
+  '#9a3412',
+  '#7c2d12',
 ]
+
+const axisTick = { fontSize: 11, fill: '#9ca3af', fontWeight: 700 as const }
+const gridStroke = 'rgba(255,255,255,0.06)'
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-gray-900 border-2 border-orange-500 px-4 py-3 text-sm shadow-xl">
-        <p className="font-black text-orange-400 uppercase tracking-widest text-xs mb-1">
+      <div className="border border-orange-500/50 bg-black px-4 py-3 shadow-[0_0_24px_-4px_rgba(249,115,22,0.4)]">
+        <p className="mb-1 text-[10px] font-black tracking-widest text-orange-500 uppercase">
           {label}
         </p>
-        <p className="font-black text-white text-base">
+        <p className="text-base font-black text-white">
           {typeof payload[0].value === 'number'
             ? payload[0].value.toLocaleString(undefined, { maximumFractionDigits: 2 })
             : payload[0].value}
@@ -49,6 +58,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     )
   }
   return null
+}
+
+const tooltipContentStyle = {
+  background: '#000000',
+  border: '1px solid rgba(249, 115, 22, 0.5)',
+  borderRadius: 0,
+  color: '#fff',
+  fontWeight: 700,
+  fontSize: 12,
 }
 
 export function ChartComponent({ type, data, height = 320 }: ChartComponentProps) {
@@ -61,36 +79,40 @@ export function ChartComponent({ type, data, height = 320 }: ChartComponentProps
   const tickInterval = transformedData.length > 20
     ? Math.floor(transformedData.length / 10)
     : transformedData.length > 10
-    ? 1
-    : 0
+      ? 1
+      : 0
 
   if (type === 'bar') {
     return (
       <ResponsiveContainer width="100%" height={height}>
         <BarChart data={transformedData} margin={{ top: 16, right: 24, left: 0, bottom: 40 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+          <CartesianGrid strokeDasharray="4 4" stroke={gridStroke} vertical={false} />
           <XAxis
             dataKey="name"
-            stroke="#6b7280"
-            tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 700 }}
+            stroke="rgba(255,255,255,0.15)"
+            tick={axisTick}
             interval={tickInterval}
             angle={transformedData.length > 8 ? -35 : 0}
             textAnchor={transformedData.length > 8 ? 'end' : 'middle'}
             height={transformedData.length > 8 ? 60 : 30}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
           <YAxis
-            stroke="#6b7280"
-            tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 700 }}
-            tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}
+            stroke="rgba(255,255,255,0.15)"
+            tick={axisTick}
+            tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v)}
             width={56}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(249,115,22,0.1)' }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(249,115,22,0.12)' }} />
           <Bar
             dataKey={data.y_label}
             fill="#f97316"
-            radius={[6, 6, 0, 0]}
+            radius={[0, 0, 0, 0]}
             animationDuration={800}
-            maxBarSize={48}
+            maxBarSize={52}
           />
         </BarChart>
       </ResponsiveContainer>
@@ -101,30 +123,38 @@ export function ChartComponent({ type, data, height = 320 }: ChartComponentProps
     return (
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={transformedData} margin={{ top: 16, right: 24, left: 0, bottom: 40 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+          <CartesianGrid strokeDasharray="4 4" stroke={gridStroke} vertical={false} />
           <XAxis
             dataKey="name"
-            stroke="#6b7280"
-            tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 700 }}
+            stroke="rgba(255,255,255,0.15)"
+            tick={axisTick}
             interval={tickInterval}
             angle={transformedData.length > 8 ? -35 : 0}
             textAnchor={transformedData.length > 8 ? 'end' : 'middle'}
             height={transformedData.length > 8 ? 60 : 30}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
           <YAxis
-            stroke="#6b7280"
-            tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 700 }}
-            tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}
+            stroke="rgba(255,255,255,0.15)"
+            tick={axisTick}
+            tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v)}
             width={56}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Line
             type="monotone"
             dataKey={data.y_label}
             stroke="#f97316"
-            strokeWidth={3}
-            dot={transformedData.length <= 30 ? { fill: '#f97316', r: 4, strokeWidth: 0 } : false}
-            activeDot={{ r: 6, fill: '#fb923c' }}
+            strokeWidth={2.5}
+            dot={
+              transformedData.length <= 30
+                ? { fill: '#f97316', r: 3, strokeWidth: 0 }
+                : false
+            }
+            activeDot={{ r: 5, fill: '#fb923c', stroke: '#000', strokeWidth: 2 }}
             animationDuration={800}
           />
         </LineChart>
@@ -151,6 +181,8 @@ export function ChartComponent({ type, data, height = 320 }: ChartComponentProps
             outerRadius={height * 0.3}
             dataKey="value"
             animationDuration={800}
+            stroke="#000000"
+            strokeWidth={2}
             label={({ percent }) => {
               const safePercent = typeof percent === 'number' ? percent : 0
               return safePercent > 0.05 ? `${(safePercent * 100).toFixed(0)}%` : ''
@@ -168,17 +200,12 @@ export function ChartComponent({ type, data, height = 320 }: ChartComponentProps
               }
               return String(value ?? '')
             }}
-            contentStyle={{
-              background: '#111827',
-              border: '2px solid #f97316',
-              borderRadius: 0,
-              color: '#fff',
-              fontWeight: 700,
-            }}
+            contentStyle={tooltipContentStyle}
+            labelStyle={{ color: '#f97316', fontWeight: 800, textTransform: 'uppercase', fontSize: 10 }}
           />
           <Legend
             formatter={(value) => (
-              <span style={{ color: '#d1d5db', fontSize: 11, fontWeight: 700 }}>{value}</span>
+              <span style={{ color: '#9ca3af', fontSize: 11, fontWeight: 700 }}>{value}</span>
             )}
           />
         </PieChart>

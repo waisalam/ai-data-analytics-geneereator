@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer"; 
 import Provider from "@/components/session-provider";
+import AppShell from "@/components/app-shell";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -30,14 +29,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}>
       <body className="min-h-full flex min-w-[320px] flex-col bg-background text-foreground">
-        
         <Provider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-           <Footer />
+          <AppShell>{children}</AppShell>
         </Provider>
-        
-       
       </body>
     </html>
   );

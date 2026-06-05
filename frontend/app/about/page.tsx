@@ -1,58 +1,120 @@
-import { Users, Target, Zap } from 'lucide-react'
+import Link from 'next/link'
+import { BarChart3, Rocket, Target, Users, Zap } from 'lucide-react'
 
-export default function About() {
+const stats = [
+  { value: '2026', label: 'Founded' },
+  { value: 'Beta', label: 'Stage' },
+  { value: '1', label: 'Solo Builder' },
+]
+
+const values = [
+  {
+    icon: Users,
+    title: 'User-Centric',
+    description:
+      'Every feature starts with a real analyst problem — messy CSVs, slow insights, and tools that get in the way.',
+  },
+  {
+    icon: Target,
+    title: 'Excellence',
+    description:
+      'We obsess over accuracy in AI answers, clarity in charts, and speed from upload to insight.',
+  },
+  {
+    icon: Zap,
+    title: 'Innovation',
+    description:
+      'Built with modern AI, open models, and a stack designed to evolve as data workflows change.',
+  },
+]
+
+const stack = ['Python', 'Next.js', 'Pandas', 'RAG', 'Open-source LLMs', 'Chroma DB']
+
+export default function AboutPage() {
   return (
-    <div className="bg-black">
-      {/* Header */}
-      <section className="border-b-4 border-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 space-y-6">
-          <h1 className="text-7xl md:text-8xl font-black text-white uppercase tracking-tighter">
-            About Us
+    <div className="bg-black text-white">
+      {/* Hero */}
+      <section className="landing-grid-pattern border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
+          <div className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-3 py-1.5">
+            <span className="h-2 w-2 rounded-full bg-orange-500 animate-landing-pulse-dot" />
+            <span className="text-xs font-bold tracking-widest text-white/80 uppercase">
+              About DataAI
+            </span>
+          </div>
+          <h1 className="mt-8 max-w-4xl text-4xl font-black tracking-tight uppercase sm:text-5xl md:text-6xl lg:text-7xl">
+            Building The Future Of{' '}
+            <span className="text-orange-500">AI Analytics</span>
           </h1>
-          <div className="w-20 h-1 bg-orange-500"></div>
-          <p className="text-xl font-bold text-white/80 max-w-2xl">
-            Transforming how businesses understand and leverage their data.
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-400 sm:text-lg">
+            DataAI helps anyone turn raw CSV data into clean datasets, smart charts, and
+            conversational insights — no analyst team required.
           </p>
         </div>
       </section>
 
-      {/* Story Section */}
-      <section className="border-b-4 border-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 space-y-12">
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Our Story</h2>
-            <div className="w-20 h-1 bg-orange-500"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <p className="text-lg font-bold text-white/80 leading-relaxed">
-                I started this journey with a bigger dream: building an operating system for companies that could manage everything inside a business. I wanted to create something powerful enough to handle operations, analytics, and decision-making in one place.
-              </p>
-              <p className="text-lg font-bold text-white/80 leading-relaxed">
-                But I quickly realized that building that kind of platform alone would require a huge team, time, and money. So instead of waiting for the perfect conditions, I started with the problem I could solve right now: data analysis. This app is my first step toward that bigger vision.
-              </p>
-              <p className="text-lg font-bold text-white/80 leading-relaxed">
-                In that future operating system, data analysis and AI-powered insights will also play a major role. That is why I am building this project with Python, full-stack web development, pandas, NumPy, RAG, scikit-learn, Chroma DB, and open-source models while learning more about AI every day.
-              </p>
-              <p className="text-lg font-bold text-white/80 leading-relaxed">
-                I am a solo developer, this project is the work of only 4 days so far, and I am still learning AIML, but I am deeply passionate about building my own business and turning this idea into something real.
-              </p>
+      {/* Story */}
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <h2 className="text-3xl font-black tracking-tight uppercase sm:text-4xl">
+                Our Story
+              </h2>
+              <p className="mt-4 text-sm text-gray-400">Why we built DataAI</p>
+              <div className="mt-8 space-y-5 text-sm leading-relaxed text-gray-400 sm:text-base">
+                <p>
+                  This project started with a bigger dream: an operating system for companies
+                  that could manage operations, analytics, and decision-making in one place.
+                </p>
+                <p>
+                  Building that alone would take a huge team, time, and capital — so we started
+                  with the problem we could solve right now: data analysis. DataAI is the first
+                  step toward that vision.
+                </p>
+                <p>
+                  In that future platform, AI-powered insights will sit at the core. That is why
+                  we are building with Python, full-stack web development, pandas, RAG,
+                  scikit-learn, Chroma DB, and open-source models while pushing forward every day.
+                </p>
+                <p>
+                  We are a solo-led project, still early and learning fast — but deeply focused on
+                  turning this into something real for analysts and teams who hate wasting time on
+                  spreadsheets.
+                </p>
+              </div>
             </div>
 
-            <div className="border-4 border-white bg-gray-950 p-12">
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <p className="text-5xl font-black text-orange-500">2026</p>
-                  <p className="text-white font-bold uppercase tracking-wider">Founded</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-5xl font-black text-orange-500">Testing</p>
-                  <p className="text-white font-bold uppercase tracking-wider">Active Users</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-5xl font-black text-orange-500">0</p>
-                  <p className="text-white font-bold uppercase tracking-wider">Team Members</p>
+            <div className="border border-white/10 bg-white/5 p-8 shadow-[0_0_60px_-12px_rgba(249,115,22,0.2)]">
+              <div className="mb-8 flex items-center gap-3 border-b border-white/10 pb-6">
+                <BarChart3 className="h-8 w-8 text-orange-500" />
+                <span className="text-sm font-bold tracking-widest text-white/60 uppercase">
+                  At a glance
+                </span>
+              </div>
+              <div className="grid gap-8 sm:grid-cols-3 lg:grid-cols-1">
+                {stats.map((stat) => (
+                  <div key={stat.label}>
+                    <p className="text-4xl font-black text-orange-500">{stat.value}</p>
+                    <p className="mt-1 text-xs font-bold tracking-widest text-white/60 uppercase">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-10 border-t border-white/10 pt-8">
+                <p className="mb-4 text-xs font-bold tracking-widest text-white/50 uppercase">
+                  Tech stack
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {stack.map((item) => (
+                    <span
+                      key={item}
+                      className="border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-bold text-orange-400 uppercase"
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -60,38 +122,30 @@ export default function About() {
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="border-b-4 border-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 space-y-12">
-          <div className="space-y-4">
-            <h2 className="text-6xl md:text-7xl font-black text-white uppercase tracking-tighter">Our Values</h2>
-            <div className="w-20 h-1 bg-orange-500"></div>
+      {/* Values */}
+      <section className="border-b border-white/10 bg-white/[0.03]">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-black tracking-tight uppercase sm:text-4xl">
+              Our Values
+            </h2>
+            <p className="mt-4 text-gray-400">What guides every product decision</p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Users,
-                title: 'User-Centric',
-                description: 'We design everything with our users in mind, ensuring intuitive and powerful experiences.',
-              },
-              {
-                icon: Target,
-                title: 'Excellence',
-                description: 'We strive for excellence in every aspect of our product and service delivery.',
-              },
-              {
-                icon: Zap,
-                title: 'Innovation',
-                description: 'We constantly innovate to stay ahead of the curve and deliver cutting-edge solutions.',
-              },
-            ].map((value) => {
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {values.map((value) => {
               const Icon = value.icon
               return (
-                <div key={value.title} className="border-4 border-white bg-gray-950 p-8 space-y-4">
-                  <Icon className="h-12 w-12 text-orange-500" />
-                  <h3 className="text-2xl font-black text-white uppercase">{value.title}</h3>
-                  <p className="text-white/80 font-bold leading-relaxed">{value.description}</p>
+                <div
+                  key={value.title}
+                  className="group border border-white/10 border-l-4 border-l-transparent bg-white/5 p-6 transition-all duration-300 hover:border-l-orange-500 hover:bg-white/[0.07]"
+                >
+                  <Icon className="h-8 w-8 text-orange-500" strokeWidth={1.75} />
+                  <h3 className="mt-4 text-lg font-black tracking-wide uppercase">
+                    {value.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-gray-400">
+                    {value.description}
+                  </p>
                 </div>
               )
             })}
@@ -99,27 +153,47 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 space-y-12">
-          <div className="space-y-4">
-            <h2 className="text-6xl md:text-7xl font-black text-white uppercase tracking-tighter">Our Team</h2>
-            <div className="w-20 h-1 bg-orange-500"></div>
+      {/* Founder */}
+      <section className="landing-grid-pattern border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <Rocket className="mx-auto h-10 w-10 text-orange-500" />
+            <h2 className="mt-6 text-3xl font-black tracking-tight uppercase sm:text-4xl">
+              Built By A Solo Founder
+            </h2>
+            <p className="mt-6 text-sm leading-relaxed text-gray-400 sm:text-base">
+              DataAI is led by Wais Alam — shipping fast, learning AI/ML in public, and building
+              toward a full business intelligence platform one feature at a time.
+            </p>
+            <div className="mt-10 border border-white/10 bg-white/5 p-8 text-left">
+              <p className="text-2xl font-black uppercase">Wais Alam</p>
+              <p className="mt-2 text-sm font-bold tracking-widest text-orange-500 uppercase">
+                Founder & Builder
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-gray-400">
+                Ranchi, India · Full-stack & AI enthusiast · Open to feedback, partnerships, and
+                early users who want to shape the product.
+              </p>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { name: 'Wais ALam', role: 'CEO & Co-Founder' },
-              { name: 'NO One', role: 'CTO & Co-Founder' },
-              { name: 'NO One', role: 'COO & Co-Founder' },  
-            ].map((member) => (
-              <div key={member.name} className="border-4 border-white bg-gray-950 p-8 space-y-4">
-                <div className="w-full h-48 bg-orange-500/20 border-2 border-orange-500"></div>
-                <h3 className="text-2xl font-black text-white uppercase">{member.name}</h3>
-                <p className="text-orange-500 font-bold uppercase tracking-wider text-sm">{member.role}</p>
-              </div>
-            ))}
-          </div>
+      {/* CTA */}
+      <section className="bg-gradient-to-r from-orange-600 to-orange-400 py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+          <h2 className="text-3xl font-black tracking-tight text-black uppercase sm:text-4xl">
+            Ready To Try DataAI?
+          </h2>
+          <p className="mt-4 text-sm font-medium text-black/70 sm:text-base">
+            Upload a CSV and get AI insights in seconds — free to start.
+          </p>
+          <Link
+            href="/signup"
+            className="mt-8 inline-block bg-black px-10 py-4 text-sm font-black tracking-wide text-white uppercase transition-colors hover:bg-black/90"
+          >
+            Get Started Free →
+          </Link>
         </div>
       </section>
     </div>

@@ -3,12 +3,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createRoot } from 'react-dom/client'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import {
   BarChart3, LineChart as LineChartIcon, PieChart as PieChartIcon,
   CheckCircle2, ChevronLeft, ChevronRight, Download, Loader2,
-  Clock, FileText, Plus, ChevronDown, ArrowUpRight
+  Clock, FileText, Plus, ArrowUpRight,
+  Home, PanelLeft, X,
 } from 'lucide-react'
 import { ChartComponent } from '@/components/chart-component'
+import { AnimateOnScroll } from '@/components/animate-on-scroll'
+import { useMobileSidebar } from '@/hooks/use-mobile-sidebar'
 
 const CHARTS_PER_PAGE = 10
 
@@ -82,11 +86,19 @@ export default function ResultsPage() {
   const [pdfProgress, setPdfProgress] = useState('')
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [activeAnalysisId, setActiveAnalysisId] = useState<string | null>(null)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const { sidebarOpen, openSidebar, closeSidebar, closeSidebarOnMobile } = useMobileSidebar()
+  const [chartHeight, setChartHeight] = useState(360)
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
   }, [status, router])
+
+  useEffect(() => {
+    const update = () => setChartHeight(window.innerWidth < 640 ? 280 : 360)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   // load session storage data on mount
   useEffect(() => {
@@ -123,8 +135,9 @@ export default function ResultsPage() {
     setData({
       charts: item.charts as ChartData[],
       cleaning_report: [],
-      columns: { date: [], number: [], text: [] }
+      columns: { date: [], number: [], text: [] },
     })
+    closeSidebarOnMobile()
   }
 
   const handleNewAnalysis = () => {
@@ -218,10 +231,10 @@ export default function ResultsPage() {
   }
 
   if (loading || status === 'loading') return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-white font-black text-lg uppercase tracking-widest">Loading…</p>
+    <div className="flex min-h-screen items-center justify-center bg-black">
+      <div className="space-y-4 text-center">
+        <Loader2 className="mx-auto h-10 w-10 animate-spin text-orange-500" />
+        <p className="text-sm font-black tracking-widest text-white uppercase">Loading analysis…</p>
       </div>
     </div>
   )
@@ -235,131 +248,166 @@ export default function ResultsPage() {
   const handlePageChange = (p: number) => { setCurrentPage(p); setActiveChart(p * CHARTS_PER_PAGE) }
 
   return (
-    <div className="bg-black min-h-screen flex" style={{ fontFamily: "'DM Mono', monospace" }}>
+    <div className="flex h-[100dvh] overflow-hidden bg-black text-white">
 
-      {/* ── SIDEBAR ── */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       <aside
-        className="flex flex-col transition-all duration-300 rounded-r-3xl border-r border-gray-800"
-        style={{ width: sidebarOpen ? '280px' : '0px', minWidth: sidebarOpen ? '280px' : '0px', overflow: 'hidden', background: '#0b0b0b' }}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[min(100vw,18rem)] flex-col border-r border-white/10 bg-black transition-transform duration-300 ease-out lg:static lg:z-auto lg:w-72 lg:shrink-0 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        {/* Sidebar header */}
-        <div className="border-b border-gray-800 p-4 flex-shrink-0">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-orange-500 font-black text-xs uppercase tracking-widest">History</p>
-            <span className="text-gray-600 text-xs font-bold">{history.length} analyses</span>
+        <div className="shrink-0 border-b border-white/10 p-4">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div>
+              <Link href="/" className="font-black text-lg tracking-tight text-orange-500 uppercase">
+                DataAI
+              </Link>
+              <p className="mt-1 text-xs font-black tracking-widest text-orange-500 uppercase">History</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white/40">{history.length}</span>
+              <button
+                type="button"
+                onClick={closeSidebar}
+                className="border border-white/10 p-2 text-white/70 transition hover:border-orange-500/50 hover:text-orange-400 lg:hidden"
+                aria-label="Close menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
           <button
             onClick={handleNewAnalysis}
-            className="w-full flex items-center justify-center gap-2 rounded-2xl border border-orange-500/60 bg-orange-500/10 text-orange-400 px-4 py-2.5 font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all duration-200"
+            className="flex w-full items-center justify-center gap-2 border border-orange-500/50 bg-orange-500/10 px-4 py-2.5 text-xs font-black tracking-widest text-orange-400 uppercase transition hover:bg-orange-500 hover:text-black"
           >
             <Plus className="h-3.5 w-3.5" />
             New Analysis
           </button>
         </div>
 
-        {/* History list */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-1">
+        <div className="flex-1 space-y-1 overflow-y-auto p-3">
           {history.length === 0 && (
-            <div className="text-center py-8">
-              <FileText className="h-8 w-8 text-gray-700 mx-auto mb-2" />
-              <p className="text-gray-600 text-xs font-bold uppercase tracking-widest">No history yet</p>
+            <div className="py-8 text-center">
+              <FileText className="mx-auto mb-2 h-8 w-8 text-white/20" />
+              <p className="text-xs font-bold tracking-widest text-white/40 uppercase">No history yet</p>
             </div>
           )}
           {history.map((item) => (
             <button
               key={item.id}
               onClick={() => handleSelectHistory(item)}
-              className={`w-full text-left rounded-2xl p-3 border transition-all duration-200 group ${
+              className={`group w-full border p-3 text-left transition ${
                 activeAnalysisId === item.id
-                  ? 'border-orange-500/70 bg-orange-500/10'
-                  : 'border-gray-800 hover:border-gray-700 hover:bg-white/5'
+                  ? 'border-orange-500/50 border-l-4 border-l-orange-500 bg-orange-500/10'
+                  : 'border-transparent border-l-4 border-l-transparent hover:border-white/10 hover:bg-white/5'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className={`text-xs font-black uppercase tracking-wide truncate ${
+                  <p className={`truncate text-xs font-black uppercase tracking-wide ${
                     activeAnalysisId === item.id ? 'text-orange-500' : 'text-white'
                   }`}>
                     {item.fileName}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-gray-600 text-xs font-bold">
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-xs font-bold text-white/40">
                       {Array.isArray(item.charts) ? item.charts.length : 0} charts
                     </span>
-                    <span className="text-gray-700">·</span>
-                    <span className="text-gray-600 text-xs font-bold flex items-center gap-1">
+                    <span className="text-white/20">·</span>
+                    <span className="flex items-center gap-1 text-xs font-bold text-white/40">
                       <Clock className="h-2.5 w-2.5" />
                       {timeAgo(item.createdAt)}
                     </span>
                   </div>
                 </div>
-                <ArrowUpRight className={`h-3.5 w-3.5 flex-shrink-0 mt-0.5 transition-opacity ${
-                  activeAnalysisId === item.id ? 'text-orange-500 opacity-100' : 'text-gray-600 opacity-0 group-hover:opacity-100'
+                <ArrowUpRight className={`mt-0.5 h-3.5 w-3.5 shrink-0 transition-opacity ${
+                  activeAnalysisId === item.id ? 'text-orange-500 opacity-100' : 'text-white/30 opacity-0 group-hover:opacity-100'
                 }`} />
               </div>
             </button>
           ))}
         </div>
 
-        {/* Sidebar footer */}
         {session?.user && (
-          <div className="border-t border-gray-800 p-4 flex-shrink-0">
+          <div className="shrink-0 border-t border-white/10 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-500 flex items-center justify-center font-black text-black text-sm flex-shrink-0">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-orange-500 text-sm font-black text-black">
                 {session.user.name?.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-white font-black text-xs uppercase tracking-wide truncate">{session.user.name}</p>
-                <p className="text-gray-600 text-xs truncate">{session.user.email}</p>
+                <p className="truncate text-xs font-black tracking-wide text-white uppercase">{session.user.name}</p>
+                <p className="truncate text-xs text-white/40">{session.user.email}</p>
               </div>
             </div>
           </div>
         )}
       </aside>
 
-      {/* ── MAIN CONTENT ── */}
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
 
-        {/* Top bar */}
-        <div className="border-b border-gray-800 px-6 py-4 flex items-center gap-4 flex-shrink-0 rounded-b-3xl" style={{ background: '#0b0b0b' }}>
+        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-white/10 bg-white/[0.02] px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
           <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="rounded-xl border border-gray-700 bg-black/80 text-white p-2 hover:bg-white hover:text-black transition-all duration-200 flex-shrink-0"
-            title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+            type="button"
+            onClick={openSidebar}
+            className="shrink-0 border border-white/10 bg-white/5 p-2 text-white transition hover:border-orange-500/50 hover:text-orange-400 lg:hidden"
+            aria-label="Open history"
           >
-            <ChevronLeft className={`h-4 w-4 transition-transform duration-300 ${sidebarOpen ? '' : 'rotate-180'}`} />
+            <PanelLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push('/analyze')}
+            className="shrink-0 border border-white/10 bg-white/5 px-2 py-2 text-[10px] font-black tracking-widest text-white/80 uppercase transition hover:border-orange-500/50 sm:px-3 sm:text-xs"
+          >
+            Chat
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="shrink-0 border border-white/10 bg-white/5 p-2 text-white/80 transition hover:border-orange-500/50"
+            title="Home"
+          >
+            <Home className="h-4 w-4" />
           </button>
 
-          <div className="flex-1 min-w-0">
-            <h1 className="text-white font-black text-lg uppercase tracking-tighter leading-none truncate">
-              {data ? (history.find(h => h.id === activeAnalysisId)?.fileName || 'Analysis Results') : 'No Analysis Selected'}
+          <div className="min-w-0 flex-1 basis-full sm:basis-auto">
+            <h1 className="truncate text-sm font-black leading-none tracking-tight text-white uppercase sm:text-lg">
+              {data ? (history.find((h) => h.id === activeAnalysisId)?.fileName || 'Analysis Results') : 'Analysis Results'}
             </h1>
             {data && (
-              <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-0.5">
+              <p className="mt-0.5 text-[10px] font-bold tracking-widest text-white/40 uppercase sm:text-xs">
                 {data.charts.length} charts
-                {data.cleaning_report.length > 0 && ` • ${data.cleaning_report.length} cleaning steps`}
+                {data.cleaning_report.length > 0 && ` · ${data.cleaning_report.length} cleaning steps`}
               </p>
             )}
           </div>
 
-          <div className="flex gap-2 flex-shrink-0">
+          <div className="ml-auto flex shrink-0 flex-wrap items-center gap-2">
             {data && (
               <button
                 onClick={handleDownloadPDF}
                 disabled={pdfLoading}
-                className="flex items-center gap-2 rounded-2xl border border-orange-500/70 bg-orange-500 text-black px-4 py-2 font-black text-xs uppercase tracking-widest hover:bg-orange-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 bg-orange-500 px-4 py-2 text-xs font-black tracking-widest text-black uppercase transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {pdfLoading
-                  ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /><span>{pdfProgress || 'Generating…'}</span></>
-                  : <><Download className="h-3.5 w-3.5" />PDF</>}
+                  ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /><span className="hidden sm:inline">{pdfProgress || 'Generating…'}</span></>
+                  : <><Download className="h-3.5 w-3.5" /><span className="hidden sm:inline">PDF</span></>}
               </button>
             )}
             <button
               onClick={handleNewAnalysis}
-              className="flex items-center gap-2 rounded-2xl border border-gray-700 bg-black/70 text-white px-4 py-2 font-black text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-200"
+              className="flex items-center gap-2 border border-white/20 px-3 py-2 text-xs font-black tracking-widest text-white/80 uppercase transition hover:border-orange-500/50 hover:text-white"
             >
               <Plus className="h-3.5 w-3.5" />
-              New
+              <span className="hidden sm:inline">New</span>
             </button>
           </div>
         </div>
@@ -367,155 +415,166 @@ export default function ResultsPage() {
         {/* Content area */}
         <div className="flex-1 overflow-y-auto">
           {!data ? (
-            // Empty state
-            <div className="flex flex-col items-center justify-center h-full min-h-96 space-y-6 p-12">
-              <div className="rounded-3xl border border-dashed border-gray-800 bg-black/80 p-12 text-center max-w-md shadow-[0_18px_60px_-35px_rgba(249,115,22,0.35)]">
-                <BarChart3 className="h-12 w-12 text-gray-700 mx-auto mb-4" />
-                <p className="text-white font-black text-xl uppercase tracking-tighter mb-2">No Analysis Selected</p>
-                <p className="text-gray-600 text-sm font-bold uppercase tracking-wide mb-6">
-                  {history.length > 0 ? 'Pick one from your history or start fresh' : 'Upload a CSV to get started'}
+            <div className="landing-grid-pattern flex min-h-96 flex-col items-center justify-center p-6 sm:p-12">
+              <AnimateOnScroll className="max-w-md border border-white/10 bg-white/5 p-8 text-center shadow-[0_0_60px_-12px_rgba(249,115,22,0.25)] sm:p-12">
+                <BarChart3 className="mx-auto mb-4 h-12 w-12 text-orange-500" />
+                <p className="mb-2 text-xl font-black tracking-tight text-white uppercase">No Analysis Selected</p>
+                <p className="mb-6 text-sm text-gray-400">
+                  {history.length > 0 ? 'Open the menu and pick an analysis' : 'Upload a CSV to get started'}
                 </p>
                 <button
-                  onClick={handleNewAnalysis}
-                  className="rounded-2xl border border-orange-500/70 bg-orange-500 text-black px-8 py-3 font-black text-sm uppercase tracking-widest hover:bg-orange-400 transition-all duration-200"
+                  type="button"
+                  onClick={history.length > 0 ? openSidebar : handleNewAnalysis}
+                  className="bg-orange-500 px-8 py-3 text-sm font-black tracking-widest text-black uppercase transition hover:bg-orange-400"
                 >
-                  New Analysis
+                  {history.length > 0 ? 'Open History' : 'New Analysis'}
                 </button>
-              </div>
+              </AnimateOnScroll>
             </div>
           ) : (
-            <div className="p-6 space-y-8 max-w-7xl mx-auto">
+            <div className="landing-grid-pattern mx-auto max-w-7xl space-y-6 p-3 sm:space-y-8 sm:p-6">
 
-              {/* Cleaning Report */}
               {data.cleaning_report.length > 0 && (
-                <div className="rounded-3xl border border-gray-800 bg-[#111111] overflow-hidden shadow-[0_18px_60px_-35px_rgba(0,0,0,0.75)]">
-                  <div className="border-b border-gray-800 px-6 py-3">
-                    <h2 className="text-lg font-black text-white tracking-tighter uppercase">Data Cleaning Report</h2>
+                <AnimateOnScroll>
+                <div className="overflow-hidden border border-white/10 bg-white/5">
+                  <div className="border-b border-white/10 px-6 py-4">
+                    <h2 className="text-lg font-black tracking-tight text-white uppercase">Data Cleaning Report</h2>
                   </div>
                   <div className="p-6">
-                    <div className="space-y-3 pl-5 border-l-4 border-orange-500">
+                    <div className="space-y-3 border-l-4 border-orange-500 pl-5">
                       {data.cleaning_report.map((line, i) => (
                         <div key={i} className="flex items-start gap-3">
-                          <CheckCircle2 className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-white font-bold leading-relaxed text-xs uppercase tracking-wide">{line}</span>
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                          <span className="text-sm leading-relaxed text-gray-300">{line}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
+                </AnimateOnScroll>
               )}
 
-              {/* Charts */}
               {data.charts.length > 0 && (
                 <div className="space-y-6">
 
-                  {/* Chart tabs */}
+                  <AnimateOnScroll delay={80}>
                   <div className="space-y-3">
-                    <div className="flex gap-2 flex-wrap border-b border-gray-800 pb-3">
+                    <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
                       {chartsInPage.map((_, i) => {
                         const idx = startIdx + i
                         return (
                           <button key={idx} onClick={() => setActiveChart(idx)}
-                            className={`rounded-xl px-4 py-2 font-black border text-xs uppercase tracking-widest transition-all duration-200 ${
-                              safeActive === idx ? 'bg-orange-500 border-orange-500 text-black' : 'bg-black border-gray-700 text-white hover:bg-white hover:text-black'
+                            className={`border px-4 py-2 text-xs font-black tracking-widest uppercase transition ${
+                              safeActive === idx
+                                ? 'border-orange-500 bg-orange-500 text-black'
+                                : 'border-white/20 bg-transparent text-white/70 hover:border-orange-500/50 hover:text-white'
                             }`}>
-                            {idx + 1}
+                            Chart {idx + 1}
                           </button>
                         )
                       })}
-                      {/* page indicator */}
                       {totalPages > 1 && (
-                        <span className="ml-auto text-gray-600 text-xs font-bold uppercase tracking-widest self-center">
+                        <span className="ml-auto self-center text-xs font-bold tracking-widest text-white/40 uppercase">
                           Page {currentPage + 1}/{totalPages}
                         </span>
                       )}
                     </div>
 
-                    {/* Pagination */}
                     {totalPages > 1 && (
-                      <div className="flex items-center justify-between rounded-2xl border border-gray-800 bg-black/70 px-4 py-2.5">
+                      <div className="flex items-center justify-between border border-white/10 bg-white/5 px-4 py-2.5">
                         <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 0}
-                          className={`flex items-center gap-1.5 rounded-xl px-4 py-2 font-black border uppercase tracking-wide text-xs transition-all duration-200 ${
-                            currentPage === 0 ? 'border-gray-800 text-gray-700 cursor-not-allowed' : 'border-gray-700 text-white hover:bg-white hover:text-black'
+                          className={`flex items-center gap-1.5 border px-4 py-2 text-xs font-black tracking-wide uppercase transition ${
+                            currentPage === 0
+                              ? 'cursor-not-allowed border-white/10 text-white/20'
+                              : 'border-white/20 text-white hover:border-orange-500/50'
                           }`}>
                           <ChevronLeft className="h-3.5 w-3.5" />Prev
                         </button>
                         <div className="flex gap-1.5">
                           {Array.from({ length: totalPages }, (_, p) => (
                             <button key={p} onClick={() => handlePageChange(p)}
-                              className={`w-7 h-7 rounded-xl font-black text-xs border transition-all duration-200 ${
-                                p === currentPage ? 'bg-orange-500 border-orange-500 text-black' : 'border-gray-700 text-white hover:bg-white hover:text-black'
+                              className={`h-8 w-8 border text-xs font-black transition ${
+                                p === currentPage
+                                  ? 'border-orange-500 bg-orange-500 text-black'
+                                  : 'border-white/20 text-white hover:border-orange-500/50'
                               }`}>{p + 1}</button>
                           ))}
                         </div>
                         <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages - 1}
-                          className={`flex items-center gap-1.5 rounded-xl px-4 py-2 font-black border uppercase tracking-wide text-xs transition-all duration-200 ${
-                            currentPage === totalPages - 1 ? 'border-gray-800 text-gray-700 cursor-not-allowed' : 'border-gray-700 text-white hover:bg-white hover:text-black'
+                          className={`flex items-center gap-1.5 border px-4 py-2 text-xs font-black tracking-wide uppercase transition ${
+                            currentPage === totalPages - 1
+                              ? 'cursor-not-allowed border-white/10 text-white/20'
+                              : 'border-white/20 text-white hover:border-orange-500/50'
                           }`}>
                           Next<ChevronRight className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     )}
                   </div>
+                  </AnimateOnScroll>
 
-                  {/* Active chart */}
                   {chart && (
-                    <div className="rounded-3xl border border-gray-800 bg-black overflow-hidden shadow-[0_18px_60px_-35px_rgba(249,115,22,0.25)]">
-                      {/* Chart header */}
-                      <div className="px-6 py-5 border-b border-orange-500/30 space-y-2" style={{ background: '#111111' }}>
+                    <AnimateOnScroll delay={120}>
+                    <div className="overflow-hidden border border-white/10 bg-white/5 shadow-[0_0_80px_-12px_rgba(249,115,22,0.2)]">
+                      <div className="space-y-2 border-b border-orange-500/30 bg-black/40 px-6 py-5">
                         <div className="flex items-center gap-3">
-                          <span className="bg-orange-500 text-black text-xs font-black px-2.5 py-1 uppercase tracking-widest">
+                          <span className="bg-orange-500 px-2.5 py-1 text-xs font-black tracking-widest text-black uppercase">
                             #{safeActive + 1}
                           </span>
-                          <span className="text-gray-400 text-xs font-black uppercase tracking-widest border border-gray-700 rounded-full px-2 py-0.5">
+                          <span className="border border-white/20 px-2 py-0.5 text-xs font-black tracking-widest text-white/50 uppercase">
                             {chart.type}
                           </span>
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter leading-tight">
+                        <h2 className="text-2xl font-black leading-tight tracking-tight text-white uppercase md:text-3xl">
                           {chart.title}
                         </h2>
-                        <p className="text-gray-300 text-sm pl-4 border-l border-orange-500/70 font-medium leading-relaxed max-w-2xl">
+                        <p className="max-w-2xl border-l-2 border-orange-500/60 pl-4 text-sm leading-relaxed text-gray-400">
                           {chart.explanation}
                         </p>
                       </div>
 
-                      <div className="p-6 space-y-5" style={{ background: '#0d0d0d' }}>
-                        {/* Chart type selector */}
-                        <div className="flex gap-2 border-b border-gray-800 pb-4">
+                      <div className="space-y-5 bg-black p-4 sm:p-6">
+                        <div className="flex flex-wrap gap-2 border-b border-white/10 pb-4">
                           {([
                             { type: 'bar' as const,  label: 'Bar',  icon: BarChart3 },
                             { type: 'line' as const, label: 'Line', icon: LineChartIcon },
                             { type: 'pie' as const,  label: 'Pie',  icon: PieChartIcon },
                           ] as const).map(({ type: t, label, icon: Icon }) => (
                             <button key={t} onClick={() => setChartType(t)}
-                              className={`flex items-center gap-1.5 rounded-xl px-4 py-2 font-black text-xs border uppercase tracking-widest transition-all duration-200 ${
-                                chartType === t ? 'bg-orange-500 border-orange-500 text-black' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
+                              className={`flex items-center gap-1.5 border px-4 py-2 text-xs font-black tracking-widest uppercase transition ${
+                                chartType === t
+                                  ? 'border-orange-500 bg-orange-500 text-black'
+                                  : 'border-white/20 text-white/60 hover:border-orange-500/50 hover:text-white'
                               }`}>
                               <Icon className="h-3.5 w-3.5" />{label}
                             </button>
                           ))}
                         </div>
 
-                        {/* Chart */}
-                        <div className="rounded-3xl bg-black border border-gray-800 p-5">
-                          <ChartComponent type={chartType} data={chart} height={360} key={`${safeActive}-${chartType}`} />
+                        <div className="border border-white/10 bg-black p-2 sm:p-5">
+                          <ChartComponent
+                            type={chartType}
+                            data={chart}
+                            height={chartHeight}
+                            key={`${safeActive}-${chartType}`}
+                          />
                         </div>
 
-                        {/* Axis info */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="rounded-2xl bg-black border border-gray-800 border-l-4 border-l-orange-500/80 p-4 space-y-1">
-                            <p className="text-orange-500 text-xs font-black uppercase tracking-widest">X-Axis</p>
-                            <p className="text-white font-black text-base uppercase tracking-tight">{chart.x_label}</p>
-                            <p className="text-gray-600 text-xs font-bold">{chart.x.length} points</p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <div className="border border-white/10 border-l-4 border-l-orange-500 bg-white/5 p-4">
+                            <p className="text-xs font-black tracking-widest text-orange-500 uppercase">X-Axis</p>
+                            <p className="mt-1 text-base font-black tracking-tight text-white uppercase">{chart.x_label}</p>
+                            <p className="mt-1 text-xs font-bold text-white/40">{chart.x.length} data points</p>
                           </div>
-                          <div className="rounded-2xl bg-black border border-gray-800 border-l-4 border-l-orange-500/80 p-4 space-y-1">
-                            <p className="text-orange-500 text-xs font-black uppercase tracking-widest">Y-Axis</p>
-                            <p className="text-white font-black text-base uppercase tracking-tight">{chart.y_label}</p>
-                            <p className="text-gray-600 text-xs font-bold">{chart.y.length} points</p>
+                          <div className="border border-white/10 border-l-4 border-l-orange-500 bg-white/5 p-4">
+                            <p className="text-xs font-black tracking-widest text-orange-500 uppercase">Y-Axis</p>
+                            <p className="mt-1 text-base font-black tracking-tight text-white uppercase">{chart.y_label}</p>
+                            <p className="mt-1 text-xs font-bold text-white/40">{chart.y.length} data points</p>
                           </div>
                         </div>
                       </div>
                     </div>
+                    </AnimateOnScroll>
                   )}
                 </div>
               )}

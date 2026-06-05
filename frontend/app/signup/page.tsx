@@ -2,9 +2,14 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowRight, Shield, Sparkles, UserRound, Mail, Lock } from 'lucide-react'
+import { ArrowRight, UserRound, Mail, Lock, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import {
+  AuthMarketingPanel,
+  authInputClass,
+  authLabelClass,
+} from '@/components/auth-marketing-panel'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({ fullName: '', email: '', password: '' })
@@ -19,7 +24,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (session.status === 'authenticated') {
-      router.push('/')
+      router.push('/analyze')
     }
   }, [session.status, router])
 
@@ -42,7 +47,6 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const validationError = validateForm()
-
     if (validationError) {
       setError(validationError)
       setSuccess('')
@@ -50,18 +54,17 @@ export default function SignupPage() {
     }
 
     setLoading(true)
+    setError('')
 
     try {
       const response = await fetch('/api/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.fullName,
           email: formData.email,
-          password: formData.password
-        })
+          password: formData.password,
+        }),
       })
 
       const data = await response.json()
@@ -72,12 +75,10 @@ export default function SignupPage() {
       }
 
       setUserEmail(formData.email)
-      setSuccess('Account created successfully. Check your email for the 6-digit OTP.')
+      setSuccess('Account created. Check your email for the 6-digit OTP.')
       setStep(2)
-      setError('')
       setFormData({ fullName: '', email: '', password: '' })
-
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
@@ -113,7 +114,7 @@ export default function SignupPage() {
       setSuccess(data.message || 'Email verified successfully.')
       setOtp('')
       setTimeout(() => router.push('/login'), 1200)
-    } catch (err) {
+    } catch {
       setError('Something went wrong while verifying your OTP.')
     } finally {
       setLoading(false)
@@ -122,150 +123,186 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid w-full gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.35em] text-orange-300">
-              <Sparkles className="h-3.5 w-3.5" />
-              Account Access
-            </div>
+      <section className="landing-grid-pattern border-b border-white/10">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-20">
+          <AuthMarketingPanel
+            badge="Get Started Free"
+            heading={
+              <>
+                Start Analyzing
+                <br />
+                <span className="text-orange-500">Your Data Today</span>
+              </>
+            }
+            description="Upload any CSV and get instant AI-powered insights. Auto-clean messy data, beautiful charts, and plain English answers."
+            trustItems={['Free forever', 'No credit card', 'Setup in 30 seconds']}
+            features={['Auto data cleaning', 'Smart charts', 'AI chat', 'Analysis history']}
+          />
 
-            <div className="space-y-4">
-              <h1 className="max-w-xl text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl lg:text-5xl">
-                Your analytics journey starts here.
-              </h1>
-              <p className="max-w-lg text-sm text-white/75 md:text-base">
-                Upload any CSV and get instant AI-powered insights. Clean data, beautiful charts, plain English explanations.
+          <div
+            className="relative animate-landing-fade-in border border-white/10 bg-white/5 p-6 shadow-[0_0_80px_-12px_rgba(249,115,22,0.35)] sm:p-8"
+            style={{ animationDelay: '150ms' }}
+          >
+            <div className="absolute -inset-px -z-10 bg-orange-500/10 blur-2xl" aria-hidden />
+
+            <div className="mb-6 border-b border-white/10 pb-6">
+              <p className="text-xs font-black tracking-widest text-orange-500 uppercase">
+                {step === 2 ? 'Verify email' : 'Create account'}
               </p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                'Auto data cleaning',
-                'AI chart insights',
-                'Secure data access',
-                'Free to use',
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_18px_60px_-35px_rgba(249,115,22,0.45)] transition duration-300 hover:-translate-y-1 hover:border-orange-500/40"
-                >
-                  <p className="text-sm font-semibold uppercase tracking-[0.22em] text-white/90">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_25px_70px_-30px_rgba(0,0,0,0.9)] backdrop-blur-xl md:p-8">
-            <div className="mb-6 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.35em] text-orange-400">Welcome</p>
-                <h2 className="mt-2 text-2xl font-black uppercase tracking-[0.12em] text-white">Create account</h2>
-              </div>
-              <div className="rounded-2xl border border-orange-500/30 bg-orange-500/10 p-3 text-orange-300">
-                <Shield className="h-5 w-5" />
-              </div>
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-white uppercase">
+                {step === 2 ? 'Enter OTP' : 'Sign Up'}
+              </h2>
             </div>
 
             {step === 2 ? (
-              <div className="space-y-6">
-                <div className="rounded-3xl border border-orange-500/20 bg-orange-500/10 p-4 text-sm text-orange-100">
-                  We sent a 6-digit OTP to <span className="font-semibold text-white">{userEmail}</span>.
+              <div className="space-y-5">
+                <div className="border border-orange-500/30 bg-orange-500/10 p-4 text-sm text-gray-300">
+                  We sent a 6-digit code to{' '}
+                  <span className="font-bold text-white">{userEmail}</span>
                 </div>
 
-                <form className="space-y-4" onSubmit={handleOtpVerify} noValidate>
-                  <label className="block space-y-2 text-sm text-white/80">
-                    <span className="text-xs font-black uppercase tracking-[0.35em] text-white/60">OTP</span>
+                <form className="space-y-5" onSubmit={handleOtpVerify} noValidate>
+                  <label className="block space-y-2">
+                    <span className={authLabelClass}>One-time password</span>
                     <input
                       type="text"
                       inputMode="numeric"
                       maxLength={6}
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="Enter 6-digit OTP"
-                      className="w-full rounded-2xl border border-white/10 bg-black/70 px-4 py-3 text-center text-xl tracking-[0.35em] text-white outline-none transition duration-300 placeholder:text-white/35 focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/20"
+                      placeholder="000000"
+                      className={`${authInputClass} text-center text-xl tracking-[0.35em]`}
                     />
                   </label>
 
-                  {error && <p className="text-sm text-red-400">{error}</p>}
-                  {success && <p className="text-sm text-emerald-400">{success}</p>}
+                  {error && (
+                    <p className="border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                      {error}
+                    </p>
+                  )}
+                  {success && (
+                    <p className="border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-sm text-orange-300">
+                      {success}
+                    </p>
+                  )}
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-black uppercase tracking-[0.28em] text-black transition duration-300 hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 bg-orange-500 px-5 py-4 text-sm font-black tracking-wide text-black uppercase transition-colors hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {loading ? 'Verifying OTP...' : 'Verify OTP'}
-                    <ArrowRight className="h-4 w-4" />
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Verifying…
+                      </>
+                    ) : (
+                      <>
+                        Verify OTP
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setStep(1)}
-                    className="w-full text-center text-xs uppercase tracking-[0.25em] text-orange-300 transition hover:text-orange-200"
+                    onClick={() => {
+                      setStep(1)
+                      setError('')
+                      setSuccess('')
+                      setOtp('')
+                    }}
+                    className="w-full text-xs font-bold tracking-widest text-white/50 uppercase transition-colors hover:text-orange-400"
                   >
-                    Back to signup
+                    ← Back to signup
                   </button>
                 </form>
               </div>
             ) : (
-              <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-                <label className="block space-y-2 text-sm text-white/80">
-                  <span className="flex items-center gap-2 font-semibold uppercase tracking-[0.22em] text-white/70">
-                    <UserRound className="h-4 w-4 text-orange-400" /> Full name
+              <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+                <label className="block space-y-2">
+                  <span className={`flex items-center gap-2 ${authLabelClass}`}>
+                    <UserRound className="h-4 w-4 text-orange-500" />
+                    Full name
                   </span>
                   <input
                     type="text"
                     placeholder="Alex Carter"
                     value={formData.fullName}
                     onChange={(e) => handleChange('fullName', e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/70 px-4 py-3 text-white outline-none transition duration-300 placeholder:text-white/35 focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/20"
+                    className={authInputClass}
+                    autoComplete="name"
                   />
                 </label>
 
-                <label className="block space-y-2 text-sm text-white/80">
-                  <span className="flex items-center gap-2 font-semibold uppercase tracking-[0.22em] text-white/70">
-                    <Mail className="h-4 w-4 text-orange-400" /> Email
+                <label className="block space-y-2">
+                  <span className={`flex items-center gap-2 ${authLabelClass}`}>
+                    <Mail className="h-4 w-4 text-orange-500" />
+                    Email
                   </span>
                   <input
                     type="email"
-                    placeholder="alex@example.com"
+                    placeholder="you@company.com"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/70 px-4 py-3 text-white outline-none transition duration-300 placeholder:text-white/35 focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/20"
+                    className={authInputClass}
+                    autoComplete="email"
                   />
                 </label>
 
-                <label className="block space-y-2 text-sm text-white/80">
-                  <span className="flex items-center gap-2 font-semibold uppercase tracking-[0.22em] text-white/70">
-                    <Lock className="h-4 w-4 text-orange-400" /> Password
+                <label className="block space-y-2">
+                  <span className={`flex items-center gap-2 ${authLabelClass}`}>
+                    <Lock className="h-4 w-4 text-orange-500" />
+                    Password
                   </span>
                   <input
                     type="password"
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => handleChange('password', e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/70 px-4 py-3 text-white outline-none transition duration-300 placeholder:text-white/35 focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/20"
+                    className={authInputClass}
+                    autoComplete="new-password"
                   />
                 </label>
 
-                {error && <p className="text-sm text-red-400">{error}</p>}
+                {error && (
+                  <p className="border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                    {error}
+                  </p>
+                )}
+                {success && (
+                  <p className="border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-sm text-orange-300">
+                    {success}
+                  </p>
+                )}
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-black uppercase tracking-[0.28em] text-black transition duration-300 hover:bg-orange-400 hover:shadow-[0_18px_40px_-18px_rgba(249,115,22,0.95)] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center gap-2 bg-orange-500 px-5 py-4 text-sm font-black tracking-wide text-black uppercase transition-colors hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {loading ? 'Creating account...' : 'Continue'}
-                  <ArrowRight className="h-4 w-4" />
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Creating account…
+                    </>
+                  ) : (
+                    <>
+                      Get Started Free
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </button>
 
-                <div className="mt-6 flex items-center justify-between text-xs uppercase tracking-[0.25em] text-white/55">
-                  <span>Already have an account?</span>
-                  <Link href="/login" className="text-orange-300 transition hover:text-orange-200">
-                    Log in
+                <p className="text-center text-sm text-gray-400">
+                  Already have an account?{' '}
+                  <Link
+                    href="/login"
+                    className="font-bold text-orange-500 uppercase transition-colors hover:text-orange-400"
+                  >
+                    Sign in →
                   </Link>
-                </div>
+                </p>
               </form>
             )}
           </div>

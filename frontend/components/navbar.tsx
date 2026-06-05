@@ -1,126 +1,157 @@
 'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import {useSession} from "next-auth/react"
+import { useSession } from 'next-auth/react'
+
+const navLinks = [
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+]
 
 export function Navbar() {
+  const pathname = usePathname()
+  const isHome = pathname === '/'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const session = useSession()
-  useEffect(()=>{
-    if(session.status === 'authenticated'){
-      setLoggedIn(true)
-    }else{
-      setLoggedIn(false)
-    }
+
+  useEffect(() => {
+    setLoggedIn(session.status === 'authenticated')
   }, [session.status])
 
-  const navLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'Services', href: '/services' },
-    { label: 'Work', href: '/work' },
-    { label: 'About', href: '/about' },
-    { label: 'Contact', href: '/contact' },
-  ]
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
+  const scrollToHowItWorks = () => {
+    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })
+    setMobileMenuOpen(false)
+  }
+
+  const linkClass = (href: string) =>
+    `text-sm font-bold tracking-wide uppercase transition-colors ${
+      pathname === href ? 'text-orange-500' : 'text-white/80 hover:text-white'
+    }`
+
+  const authLinks = loggedIn ? (
+    <Link
+      href="/dashboard"
+      className="bg-orange-500 px-4 py-2 text-sm font-bold tracking-wide text-black uppercase transition-colors hover:bg-orange-400 sm:px-5"
+    >
+      Dashboard
+    </Link>
+  ) : (
+    <>
+      <Link
+        href="/login"
+        className="text-sm font-bold tracking-wide text-white uppercase transition-colors hover:text-orange-500"
+      >
+        Login
+      </Link>
+      <Link
+        href="/signup"
+        className="bg-orange-500 px-4 py-2 text-sm font-bold tracking-wide text-black uppercase transition-colors hover:bg-orange-400 sm:px-5"
+      >
+        Get Started
+      </Link>
+    </>
+  )
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/95 backdrop-blur-2xl shadow-[0_18px_50px_-30px_rgba(0,0,0,0.95)]">
-      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-3 sm:h-20 sm:gap-6">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-500/20 bg-white/5 text-orange-400 shadow-[0_15px_40px_-25px_rgba(249,115,22,0.7)] sm:h-12 sm:w-12 sm:rounded-3xl">
-              <span className="font-black text-lg tracking-tight">DA</span>
-            </div>
-            <span className="hidden text-lg font-black uppercase tracking-[0.24em] text-white sm:block sm:text-xl">
-              DataViz
-            </span>
-          </Link>
+    <header className="fixed top-0 right-0 left-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link
+          href="/"
+          className="font-black text-xl tracking-tight text-orange-500 uppercase"
+        >
+          DataAI
+        </Link>
 
-          <div className="hidden items-center gap-3 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-300 transition duration-300 hover:bg-white/10 hover:text-white"
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            {loggedIn ? (
-              <Link
-                  href="/dashboard"
-                  className="rounded-full bg-orange-500 px-6 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-950 shadow-[0_14px_38px_-18px_rgba(249,115,22,0.9)] transition duration-300 hover:bg-orange-400"
-                >
-                  Dashboard
-                </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-200 transition duration-300 hover:border-orange-500/50 hover:bg-white/10 hover:text-white"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/signup"
-                  className="rounded-full bg-orange-500 px-6 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-950 shadow-[0_14px_38px_-18px_rgba(249,115,22,0.9)] transition duration-300 hover:bg-orange-400"
-                >
-                  SignUp
-                </Link>
-              </>
-            )}
-            
-          </div>
-
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white transition duration-300 hover:border-orange-500 hover:text-orange-400 md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+        <div className="hidden items-center gap-5 sm:gap-6 md:flex">
+          {navLinks.map((link) => (
+            <Link key={link.href} href={link.href} className={linkClass(link.href)}>
+              {link.label}
+            </Link>
+          ))}
+          {isHome && (
+            <button
+              type="button"
+              onClick={scrollToHowItWorks}
+              className="text-sm font-bold tracking-wide text-white/80 uppercase transition-colors hover:text-white"
+            >
+              How It Works
+            </button>
+          )}
+          {authLinks}
         </div>
 
-        {mobileMenuOpen && (
-          <div className="mt-3 space-y-2 rounded-[1.5rem] border border-white/10 bg-black/98 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl sm:mt-4 sm:space-y-3 sm:rounded-[2rem] sm:p-4">
+        <button
+          type="button"
+          className="flex h-10 w-10 items-center justify-center border border-white/10 text-white transition-colors hover:border-orange-500 hover:text-orange-500 md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
+
+      {mobileMenuOpen && (
+        <div className="border-t border-white/10 bg-black/95 px-4 py-4 backdrop-blur-md md:hidden">
+          <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block rounded-3xl px-5 py-3 text-sm font-semibold uppercase tracking-[0.22em] text-slate-200 transition duration-300 hover:bg-white/10 hover:text-white"
+                className={`py-2 text-sm font-bold tracking-wide uppercase ${
+                  pathname === link.href ? 'text-orange-500' : 'text-white'
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-               {loggedIn ? (
+            {isHome && (
+              <button
+                type="button"
+                onClick={scrollToHowItWorks}
+                className="py-2 text-left text-sm font-bold tracking-wide text-white uppercase"
+              >
+                How It Works
+              </button>
+            )}
+            {loggedIn ? (
               <Link
-                  href="/dashboard"
-                  className="rounded-full bg-orange-500 px-6 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-950 shadow-[0_14px_38px_-18px_rgba(249,115,22,0.9)] transition duration-300 hover:bg-orange-400"
-                >
-                  Dashboard
-                </Link>
+                href="/dashboard"
+                className="bg-orange-500 px-4 py-3 text-center text-sm font-bold tracking-wide text-black uppercase"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
             ) : (
               <>
                 <Link
                   href="/login"
-                  className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-200 transition duration-300 hover:border-orange-500/50 hover:bg-white/10 hover:text-white"
+                  className="py-2 text-sm font-bold tracking-wide text-white uppercase"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
-                  className="rounded-full bg-orange-500 px-6 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-950 shadow-[0_14px_38px_-18px_rgba(249,115,22,0.9)] transition duration-300 hover:bg-orange-400"
+                  className="bg-orange-500 px-4 py-3 text-center text-sm font-bold tracking-wide text-black uppercase"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  SignUp
+                  Get Started
                 </Link>
               </>
             )}
           </div>
-        )}
-      </div>
-    </nav>
+        </div>
+      )}
+    </header>
   )
 }

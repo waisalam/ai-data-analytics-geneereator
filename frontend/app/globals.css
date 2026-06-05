@@ -117,6 +117,74 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
+  }
+}
+
+@keyframes landing-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-cta-drift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 48px 48px;
+  }
+}
+
+@keyframes landing-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+@layer utilities {
+  .animate-landing-fade-in {
+    animation: landing-fade-in 0.7s ease-out both;
+  }
+  .animate-landing-fade-up {
+    animation: landing-fade-up 0.65s ease-out both;
+  }
+  .animate-landing-cta-drift {
+    animation: landing-cta-drift 20s linear infinite;
+  }
+  .animate-landing-pulse-dot {
+    animation: landing-pulse-dot 1.5s ease-in-out infinite;
+  }
+  .landing-grid-pattern {
+    background-image:
+      linear-gradient(rgba(249, 115, 22, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(249, 115, 22, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .landing-cta-pattern {
+    background-image: radial-gradient(rgba(0, 0, 0, 0.12) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
   }
 }
