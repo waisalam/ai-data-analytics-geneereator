@@ -1,7 +1,8 @@
 'use client'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function PaymentPage() {
+function PaymentContent() {
   const searchParams = useSearchParams()
   const userId = searchParams.get('userId') || 'guest'
 
@@ -43,5 +44,17 @@ export default function PaymentPage() {
         </div>
       </section>
     </main>
+  )
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <PaymentContent />
+    </Suspense>
   )
 }
