@@ -27,6 +27,7 @@ export const authOptions: AuthOptions = {
             return null
         }
 
+
         const isMatch = await bcrypt.compare(credentials.password, user.password)
 
         if (!isMatch) {
