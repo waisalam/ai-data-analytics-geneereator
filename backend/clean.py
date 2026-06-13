@@ -7,6 +7,8 @@ from transformers import pipeline
 
 load_dotenv()
 
+_pipe = None  # lazy-loaded on first Gemini failure
+
 def get_pipe():
     global _pipe
     if _pipe is None:
@@ -128,6 +130,56 @@ def generate_charts(df, date_cols, number_cols, text_cols):
                     continue
 
     return charts
+
+def generate_dataset_summary(df: pd.DataFrame) -> str:
+    """Compact statistical summary of the FULL dataset for AI context (~200 tokens)."""
+    lines = []
+    rows, cols = df.shape
+    lines.append(f"Dataset: {rows} rows, {cols} columns")
+    lines.append(f"Columns: {', '.join(df.columns.tolist())}")
+
+    nulls = df.isnull().sum()
+    null_parts = [f"{c}:{v}" for c, v in nulls.items() if v > 0]
+    lines.append("Nulls: " + (", ".join(null_parts) if null_parts else "none"))
+
+    num_df = df.select_dtypes(include="number")
+    if not num_df.empty:
+        lines.append("Numeric stats (mean/min/max/std):")
+        for col in num_df.columns:
+            s = num_df[col].describe()
+            lines.append(
+                f"  {col}: mean={round(s['mean'],2)}, min={round(s['min'],2)}, "
+                f"max={round(s['max'],2)}, std={round(s['std'],2)}"
+            )
+
+    cat_df = df.select_dtypes(exclude="number")
+    if not cat_df.empty:
+        lines.append("Categorical top values:")
+        for col in cat_df.columns[:5]:
+            top = df[col].value_counts().head(5)
+            top_str = ", ".join([f"{k}({v})" for k, v in top.items()])
+            lines.append(f"  {col}: {top_str}")
+
+    if len(num_df.columns) >= 2:
+        try:
+            corr = num_df.corr().abs()
+            num_cols_list = num_df.columns.tolist()
+            pairs = []
+            for i in range(len(num_cols_list)):
+                for j in range(i + 1, len(num_cols_list)):
+                    val = corr.iloc[i, j]
+                    if not pd.isna(val):
+                        pairs.append((num_cols_list[i], num_cols_list[j], round(float(val), 2)))
+            pairs.sort(key=lambda x: -x[2])
+            if pairs:
+                lines.append("Top correlations:")
+                for a, b, c in pairs[:3]:
+                    lines.append(f"  {a} ↔ {b}: {c}")
+        except Exception:
+            pass
+
+    return "\n".join(lines)
+
 
 def explain_chart(chart):
     x = chart["x"]

@@ -29,6 +29,7 @@ export type AnalysisMinAggregateOutputType = {
   userId: string | null
   fileName: string | null
   fileUrl: string | null
+  datasetSummary: string | null
   createdAt: Date | null
 }
 
@@ -37,6 +38,7 @@ export type AnalysisMaxAggregateOutputType = {
   userId: string | null
   fileName: string | null
   fileUrl: string | null
+  datasetSummary: string | null
   createdAt: Date | null
 }
 
@@ -46,6 +48,7 @@ export type AnalysisCountAggregateOutputType = {
   fileName: number
   fileUrl: number
   charts: number
+  datasetSummary: number
   createdAt: number
   _all: number
 }
@@ -56,6 +59,7 @@ export type AnalysisMinAggregateInputType = {
   userId?: true
   fileName?: true
   fileUrl?: true
+  datasetSummary?: true
   createdAt?: true
 }
 
@@ -64,6 +68,7 @@ export type AnalysisMaxAggregateInputType = {
   userId?: true
   fileName?: true
   fileUrl?: true
+  datasetSummary?: true
   createdAt?: true
 }
 
@@ -73,6 +78,7 @@ export type AnalysisCountAggregateInputType = {
   fileName?: true
   fileUrl?: true
   charts?: true
+  datasetSummary?: true
   createdAt?: true
   _all?: true
 }
@@ -155,6 +161,7 @@ export type AnalysisGroupByOutputType = {
   fileName: string
   fileUrl: string
   charts: runtime.JsonValue
+  datasetSummary: string | null
   createdAt: Date
   _count: AnalysisCountAggregateOutputType | null
   _min: AnalysisMinAggregateOutputType | null
@@ -185,6 +192,7 @@ export type AnalysisWhereInput = {
   fileName?: Prisma.StringFilter<"Analysis"> | string
   fileUrl?: Prisma.StringFilter<"Analysis"> | string
   charts?: Prisma.JsonFilter<"Analysis">
+  datasetSummary?: Prisma.StringNullableFilter<"Analysis"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Analysis"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   chats?: Prisma.ChatListRelationFilter
@@ -196,6 +204,7 @@ export type AnalysisOrderByWithRelationInput = {
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
   charts?: Prisma.SortOrder
+  datasetSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   chats?: Prisma.ChatOrderByRelationAggregateInput
@@ -210,6 +219,7 @@ export type AnalysisWhereUniqueInput = Prisma.AtLeast<{
   fileName?: Prisma.StringFilter<"Analysis"> | string
   fileUrl?: Prisma.StringFilter<"Analysis"> | string
   charts?: Prisma.JsonFilter<"Analysis">
+  datasetSummary?: Prisma.StringNullableFilter<"Analysis"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Analysis"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   chats?: Prisma.ChatListRelationFilter
@@ -221,6 +231,7 @@ export type AnalysisOrderByWithAggregationInput = {
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
   charts?: Prisma.SortOrder
+  datasetSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.AnalysisCountOrderByAggregateInput
   _max?: Prisma.AnalysisMaxOrderByAggregateInput
@@ -236,6 +247,7 @@ export type AnalysisScalarWhereWithAggregatesInput = {
   fileName?: Prisma.StringWithAggregatesFilter<"Analysis"> | string
   fileUrl?: Prisma.StringWithAggregatesFilter<"Analysis"> | string
   charts?: Prisma.JsonWithAggregatesFilter<"Analysis">
+  datasetSummary?: Prisma.StringNullableWithAggregatesFilter<"Analysis"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Analysis"> | Date | string
 }
 
@@ -244,6 +256,7 @@ export type AnalysisCreateInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAnalysesInput
   chats?: Prisma.ChatCreateNestedManyWithoutAnalysisInput
@@ -255,6 +268,7 @@ export type AnalysisUncheckedCreateInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutAnalysisInput
 }
@@ -264,6 +278,7 @@ export type AnalysisUpdateInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAnalysesNestedInput
   chats?: Prisma.ChatUpdateManyWithoutAnalysisNestedInput
@@ -275,6 +290,7 @@ export type AnalysisUncheckedUpdateInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chats?: Prisma.ChatUncheckedUpdateManyWithoutAnalysisNestedInput
 }
@@ -285,6 +301,7 @@ export type AnalysisCreateManyInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
 }
 
@@ -293,6 +310,7 @@ export type AnalysisUpdateManyMutationInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -302,6 +320,7 @@ export type AnalysisUncheckedUpdateManyInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -321,6 +340,7 @@ export type AnalysisCountOrderByAggregateInput = {
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
   charts?: Prisma.SortOrder
+  datasetSummary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -329,6 +349,7 @@ export type AnalysisMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
+  datasetSummary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -337,6 +358,7 @@ export type AnalysisMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
+  datasetSummary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -406,6 +428,7 @@ export type AnalysisCreateWithoutUserInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
   chats?: Prisma.ChatCreateNestedManyWithoutAnalysisInput
 }
@@ -415,6 +438,7 @@ export type AnalysisUncheckedCreateWithoutUserInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutAnalysisInput
 }
@@ -454,6 +478,7 @@ export type AnalysisScalarWhereInput = {
   fileName?: Prisma.StringFilter<"Analysis"> | string
   fileUrl?: Prisma.StringFilter<"Analysis"> | string
   charts?: Prisma.JsonFilter<"Analysis">
+  datasetSummary?: Prisma.StringNullableFilter<"Analysis"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Analysis"> | Date | string
 }
 
@@ -462,6 +487,7 @@ export type AnalysisCreateWithoutChatsInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAnalysesInput
 }
@@ -472,6 +498,7 @@ export type AnalysisUncheckedCreateWithoutChatsInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
 }
 
@@ -496,6 +523,7 @@ export type AnalysisUpdateWithoutChatsInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAnalysesNestedInput
 }
@@ -506,6 +534,7 @@ export type AnalysisUncheckedUpdateWithoutChatsInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -514,6 +543,7 @@ export type AnalysisCreateManyUserInput = {
   fileName: string
   fileUrl: string
   charts: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: string | null
   createdAt?: Date | string
 }
 
@@ -522,6 +552,7 @@ export type AnalysisUpdateWithoutUserInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chats?: Prisma.ChatUpdateManyWithoutAnalysisNestedInput
 }
@@ -531,6 +562,7 @@ export type AnalysisUncheckedUpdateWithoutUserInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chats?: Prisma.ChatUncheckedUpdateManyWithoutAnalysisNestedInput
 }
@@ -540,6 +572,7 @@ export type AnalysisUncheckedUpdateManyWithoutUserInput = {
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   charts?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  datasetSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -580,6 +613,7 @@ export type AnalysisSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   fileName?: boolean
   fileUrl?: boolean
   charts?: boolean
+  datasetSummary?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chats?: boolean | Prisma.Analysis$chatsArgs<ExtArgs>
@@ -592,6 +626,7 @@ export type AnalysisSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   fileName?: boolean
   fileUrl?: boolean
   charts?: boolean
+  datasetSummary?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["analysis"]>
@@ -602,6 +637,7 @@ export type AnalysisSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   fileName?: boolean
   fileUrl?: boolean
   charts?: boolean
+  datasetSummary?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["analysis"]>
@@ -612,10 +648,11 @@ export type AnalysisSelectScalar = {
   fileName?: boolean
   fileUrl?: boolean
   charts?: boolean
+  datasetSummary?: boolean
   createdAt?: boolean
 }
 
-export type AnalysisOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "fileName" | "fileUrl" | "charts" | "createdAt", ExtArgs["result"]["analysis"]>
+export type AnalysisOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "fileName" | "fileUrl" | "charts" | "datasetSummary" | "createdAt", ExtArgs["result"]["analysis"]>
 export type AnalysisInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chats?: boolean | Prisma.Analysis$chatsArgs<ExtArgs>
@@ -640,6 +677,7 @@ export type $AnalysisPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     fileName: string
     fileUrl: string
     charts: runtime.JsonValue
+    datasetSummary: string | null
     createdAt: Date
   }, ExtArgs["result"]["analysis"]>
   composites: {}
@@ -1071,6 +1109,7 @@ export interface AnalysisFieldRefs {
   readonly fileName: Prisma.FieldRef<"Analysis", 'String'>
   readonly fileUrl: Prisma.FieldRef<"Analysis", 'String'>
   readonly charts: Prisma.FieldRef<"Analysis", 'Json'>
+  readonly datasetSummary: Prisma.FieldRef<"Analysis", 'String'>
   readonly createdAt: Prisma.FieldRef<"Analysis", 'DateTime'>
 }
     

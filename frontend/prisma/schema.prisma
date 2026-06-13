@@ -27,13 +27,14 @@ model User{
 }
 
 model Analysis {
-  id        String   @id @default(cuid())
-  userId    String
-  fileName  String
-  fileUrl   String   // stored in cloud storage
-  charts    Json     // your charts array
-  createdAt DateTime @default(now())
-  
+  id              String   @id @default(cuid())
+  userId          String
+  fileName        String
+  fileUrl         String
+  charts          Json
+  datasetSummary  String?
+  createdAt       DateTime @default(now())
+
   user      User     @relation(fields: [userId], references: [id])
   chats     Chat[]
 }

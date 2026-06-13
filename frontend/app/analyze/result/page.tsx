@@ -551,7 +551,7 @@ export default function ResultsPage() {
                           ))}
                         </div>
 
-                        <div className="border border-white/10 bg-black p-2 sm:p-5">
+                        <div className="overflow-hidden border border-white/10 bg-black p-2 sm:p-5">
                           <ChartComponent
                             type={chartType}
                             data={chart}

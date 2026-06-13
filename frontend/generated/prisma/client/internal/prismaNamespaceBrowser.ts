@@ -93,6 +93,7 @@ export const AnalysisScalarFieldEnum = {
   fileName: 'fileName',
   fileUrl: 'fileUrl',
   charts: 'charts',
+  datasetSummary: 'datasetSummary',
   createdAt: 'createdAt'
 } as const
 

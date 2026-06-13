@@ -13,7 +13,6 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-            console.log("Missing credentials", credentials)
             return null
         }
 
@@ -21,21 +20,10 @@ export const authOptions: AuthOptions = {
           where: { email: credentials.email }
         })
 
-        console.log("User found:", user)
-        if (!user) {
-            console.log("User not found")
-            return null
-        }
-
+        if (!user) return null
 
         const isMatch = await bcrypt.compare(credentials.password, user.password)
-
-        if (!isMatch) {
-            console.log("Password does not match")
-            return null
-        }
-
-        console.log("User authenticated:", user)
+        if (!isMatch) return null
 
         return {
           id: String(user.id),

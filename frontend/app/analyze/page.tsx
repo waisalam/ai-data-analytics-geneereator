@@ -47,6 +47,7 @@ export default function ChatPage() {
     const [loadingHistory, setLoadingHistory] = useState(true)
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
     const [upgradeMessage, setUpgradeMessage] = useState('')
+    const [uploadError, setUploadError] = useState<string | null>(null)
     const bottomRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const { sidebarOpen, openSidebar, closeSidebar, closeSidebarOnMobile } = useMobileSidebar()
@@ -110,6 +111,7 @@ export default function ChatPage() {
         setUploadingFileName(file.name)
         setActiveAnalysis(null)
         setMessages([])
+        setUploadError(null)
 
         try {
             const formData = new FormData()
@@ -132,7 +134,7 @@ export default function ChatPage() {
             }
 
             if (!res.ok) {
-                alert(data.message || 'Upload failed. Please try again.')
+                setUploadError(data.message || 'Upload failed. Please try again.')
                 return
             }
 
@@ -148,7 +150,7 @@ export default function ChatPage() {
                 await loadAnalysis(newAnalysis)
             }
         } catch {
-            alert('Upload failed. Please try again.')
+            setUploadError('Upload failed. Please check your connection and try again.')
         } finally {
             setUploading(false)
             setUploadingFileName(null)
@@ -186,10 +188,19 @@ export default function ChatPage() {
             }
 
             const data = await res.json()
+
+            if (!res.ok) {
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: data.message || 'Something went wrong. Please try again.'
+                }])
+                return
+            }
+
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: data.answer,
-                chart: data.chart  // ← fixed: was data.charts
+                content: data.answer || 'Sorry, I could not generate a response.',
+                chart: data.chart
             }])
         } catch {
             setMessages(prev => [...prev, {
@@ -420,6 +431,12 @@ export default function ChatPage() {
                                         Upload a CSV file or select a past analysis to start asking questions
                                     </p>
                                 </div>
+                                {uploadError && (
+                                    <div className="flex w-full max-w-sm items-start gap-3 border border-red-500/40 bg-red-500/10 px-4 py-3 text-left">
+                                        <span className="mt-0.5 shrink-0 text-red-400">✕</span>
+                                        <p className="text-sm font-bold text-red-400">{uploadError}</p>
+                                    </div>
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}

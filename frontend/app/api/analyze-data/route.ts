@@ -3,45 +3,67 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
+
+function sanitizeFilename(name: string): string {
+  return name
+    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .replace(/\.{2,}/g, '.')
+    .slice(0, 100)
+}
 
 
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 uploads per IP per 5 minutes
+    const ip = getClientIp(request)
+    const { allowed } = checkRateLimit(ip, 'analyze', 5, 5 * 60_000)
+    if (!allowed) {
+      return NextResponse.json({ message: 'Too many requests. Please wait a few minutes.' }, { status: 429 })
+    }
+
     const session = await getServerSession(authOptions)
     if (!session) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
 
-        const dbUser = await prisma.user.findUnique({
-  where: { email: session.user.email! }
-})
-const user = await prisma.user.findUnique({
-  where:{email: session.user.email!},
-  include: { _count: { select: { analyses: true } } }
-})
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email! },
+      include: { _count: { select: { analyses: true } } }
+    })
+    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 })
 
-if(user?.plan === 'free' && user._count.analyses >= 2){
-   return NextResponse.json(
-    { message: 'Free tier limit reached. Upgrade to upload more files.' },
-    { status: 403 }
-  )
-}
-
-if (!dbUser) return NextResponse.json({ message: 'User not found' }, { status: 404 })
-
-
+    if (user.plan === 'free' && user._count.analyses >= 2) {
+      return NextResponse.json(
+        { message: 'Free tier limit reached. Upgrade to upload more files.' },
+        { status: 403 }
+      )
+    }
 
     const formData = await request.formData()
     const file = formData.get('file') as File
-
     if (!file) return NextResponse.json({ message: 'No file provided' }, { status: 400 })
 
+    // Validate: extension must be .csv
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (ext !== 'csv') {
+      return NextResponse.json({ message: 'Only .csv files are allowed.' }, { status: 400 })
+    }
+
+    // Validate: max 10 MB
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ message: 'File too large. Maximum size is 10 MB.' }, { status: 400 })
+    }
+
+    const safeFilename = sanitizeFilename(file.name)
+
     // 1. upload to blob
-    const blob = await put(file.name, file, {
+    const blob = await put(safeFilename, file, {
       access: 'public',
       contentType: 'text/csv',
       addRandomSuffix: true
     })
-    console.log('Blob uploaded:', blob.url)
 
     // 2. forward to HuggingFace
     const hfForm = new FormData()
@@ -51,23 +73,24 @@ if (!dbUser) return NextResponse.json({ message: 'User not found' }, { status: 4
       method: 'POST',
       body: hfForm
     })
-    console.log('HuggingFace status:', response.status)
+
+    if (!response.ok) {
+      console.error('HuggingFace error:', response.status)
+      return NextResponse.json({ message: 'Analysis service unavailable. Please try again.' }, { status: 502 })
+    }
 
     const result = await response.json()
-    console.log('HuggingFace result received')
-// console.log('Charts type:', typeof result.charts)
-// console.log('Charts is array:', Array.isArray(result.charts))
-// console.log('Charts length:', result.charts?.length)
+
     // 3. save to DB
     const analysis = await prisma.analysis.create({
       data: {
         userId: session.user.id,
-        fileName: file.name,
+        fileName: safeFilename,
         fileUrl: blob.url,
-        charts: JSON.parse(JSON.stringify(result.charts))
+        charts: JSON.parse(JSON.stringify(result.charts)),
+        datasetSummary: result.dataset_summary ?? null
       }
     })
-    console.log('Analysis saved to DB:', analysis.id)
 
     return NextResponse.json({
       ...result,
@@ -76,9 +99,8 @@ if (!dbUser) return NextResponse.json({ message: 'User not found' }, { status: 4
     })
 
   } catch (error) {
-    // this will print the EXACT error in terminal
     console.error('Analyze route error:', error)
-    return NextResponse.json({ message: 'Internal server error', error: String(error) }, { status: 500 })
+    return NextResponse.json({ message: 'Something went wrong. Please try again.' }, { status: 500 })
   }
 }
 

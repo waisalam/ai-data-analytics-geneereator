@@ -3,11 +3,63 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import OpenAI from 'openai'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
+// Groq — OpenAI-compatible, fastest inference
+const groq = new OpenAI({
+  baseURL: 'https://api.groq.com/openai/v1',
+  apiKey: process.env.GROQ_API_KEY ?? 'missing'
+})
+
+// OpenRouter — final fallback, key already in env
 const openrouter = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
   apiKey: process.env.OPENROUTER_API_KEY!
 })
+
+type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
+
+async function callAI(messages: ChatMessage[]): Promise<string> {
+  // 1 — Groq: llama-3.3-70b-versatile (primary, fast, free tier)
+  if (process.env.GROQ_API_KEY) {
+    try {
+      const res = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        max_tokens: 500,
+        temperature: 0.5
+      })
+      console.log('[AI] answered by groq/llama-3.3-70b-versatile')
+      return res.choices[0]?.message?.content?.trim() ?? ''
+    } catch (err) {
+      console.warn('[AI] groq/llama-3.3-70b-versatile failed:', (err as Error).message)
+    }
+
+    // 2 — Groq: openai/gpt-oss-120b (fallback, ~500 tok/s)
+    try {
+      const res = await groq.chat.completions.create({
+        model: 'openai/gpt-oss-120b',
+        messages,
+        max_tokens: 500,
+        temperature: 0.5
+      })
+      console.log('[AI] answered by groq/openai/gpt-oss-120b')
+      return res.choices[0]?.message?.content?.trim() ?? ''
+    } catch (err) {
+      console.warn('[AI] groq/openai/gpt-oss-120b failed:', (err as Error).message)
+    }
+  }
+
+  // 3 — OpenRouter: llama-4-scout:free (final fallback)
+  const res = await openrouter.chat.completions.create({
+    model: 'meta-llama/llama-4-scout:free',
+    messages,
+    max_tokens: 500,
+    temperature: 0.5
+  })
+  console.log('[AI] answered by openrouter/llama-4-scout:free')
+  return res.choices[0]?.message?.content?.trim() ?? ''
+}
 
 // detect if user wants a chart
 function wantsChart(question: string): boolean {
@@ -54,6 +106,13 @@ function buildChartFromAnalysis(question: string, charts: any[]) {
 }
 
 export async function POST(request: Request) {
+  // Rate limit: 20 chat requests per IP per minute
+  const ip = getClientIp(request)
+  const { allowed } = checkRateLimit(ip, 'chat', 20, 60_000)
+  if (!allowed) {
+    return NextResponse.json({ message: 'Too many requests. Please wait a minute.' }, { status: 429 })
+  }
+
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
 
@@ -62,10 +121,17 @@ export async function POST(request: Request) {
   })
   if (!dbUser) return NextResponse.json({ message: 'User not found' }, { status: 404 })
 
-  const { question, analysisId } = await request.json()
+  const body = await request.json()
+  const { question, analysisId } = body
 
-  if (!question || !analysisId) {
-    return NextResponse.json({ message: 'question and analysisId are required' }, { status: 400 })
+  if (!analysisId) {
+    return NextResponse.json({ message: 'analysisId is required' }, { status: 400 })
+  }
+  if (!question || typeof question !== 'string' || !question.trim()) {
+    return NextResponse.json({ message: 'question must be a non-empty string' }, { status: 400 })
+  }
+  if (question.length > 2000) {
+    return NextResponse.json({ message: 'question must be 2000 characters or fewer' }, { status: 400 })
   }
 
   const analysis = await prisma.analysis.findFirst({
@@ -95,48 +161,36 @@ export async function POST(request: Request) {
   ).join('\n\n')
 
   const charts = (analysis.charts as any[]) ?? []
-  const chartSummary = charts.map((c: any, i: number) => {
-    const topPoints = (c.x as any[]).slice(0, 10).map((x: any, j: number) =>
-      `  ${x}: ${c.y[j]}`
-    ).join('\n')
-    return `Chart ${i + 1}: "${c.title}" (${c.type})\nTop data points:\n${topPoints}\nInsight: ${c.explanation}`
-  }).join('\n\n')
+  const datasetSummary = (analysis as any).datasetSummary ?? ''
 
-  // your original prompt — unchanged
+  // Chart list with just titles and insights — no raw row slicing
+  const chartList = charts.map((c: any, i: number) =>
+    `Chart ${i + 1}: "${c.title}" (${c.type}) — ${c.explanation ?? ''}`
+  ).join('\n')
+
   const prompt = `You are a data analyst assistant. The user uploaded a CSV file called "${analysis.fileName}".
 
-Here is the analyzed chart data:
-${chartSummary}
+${datasetSummary ? `FULL DATASET STATISTICS (computed from every row):\n${datasetSummary}\n\n` : ''}Available charts:
+${chartList}
 
-${historyText ? `Previous conversation:\n${historyText}\n\n` : ''}
-User question: ${question}
+${historyText ? `Previous conversation:\n${historyText}\n\n` : ''}User question: ${question}
 
 Answer clearly and concisely. Reference specific numbers from the data when relevant.`
 
-  try {
-    const completion = await openrouter.chat.completions.create({
-      model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a data analyst assistant. Be concise and reference specific numbers.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 300,
-      temperature: 0.5,
-      stream: false
-    })
+  const messages: ChatMessage[] = [
+    {
+      role: 'system',
+      content: 'You are a data analyst assistant. Be concise and reference specific numbers.'
+    },
+    { role: 'user', content: prompt }
+  ]
 
-    let answer = completion.choices[0]?.message?.content?.trim()
-      || 'Sorry, I could not generate a response.'
+  try {
+    let answer = await callAI(messages)
+    if (!answer) answer = 'Sorry, I could not generate a response.'
     answer = answer.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
     answer = answer.replace(/^(answer:|response:|assistant:)/i, '').trim()
 
-    // build chart if user asked for one
     const chartData = wantsChart(question)
       ? buildChartFromAnalysis(question, charts)
       : null
@@ -150,15 +204,12 @@ Answer clearly and concisely. Reference specific numbers from the data when rele
       }
     })
 
-    return NextResponse.json({
-      answer,
-      chart: chartData
-    })
+    return NextResponse.json({ answer, chart: chartData })
 
   } catch (err: any) {
-    console.error('OpenRouter error:', err)
+    console.error('[AI] all models failed:', err)
     return NextResponse.json(
-      { message: err?.message || 'AI request failed' },
+      { message: 'AI request failed. Please try again.' },
       { status: 500 }
     )
   }
