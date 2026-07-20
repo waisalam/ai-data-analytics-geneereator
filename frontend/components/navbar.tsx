@@ -34,13 +34,13 @@ export function Navbar() {
 
   const linkClass = (href: string) =>
     `text-sm font-bold tracking-wide uppercase transition-colors ${
-      pathname === href ? 'text-orange-500' : 'text-white/80 hover:text-white'
+      pathname === href ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
     }`
 
   const authLinks = loggedIn ? (
     <Link
       href="/dashboard"
-      className="bg-orange-500 px-4 py-2 text-sm font-bold tracking-wide text-black uppercase transition-colors hover:bg-orange-400 sm:px-5"
+      className="bg-primary px-4 py-2 text-sm font-bold tracking-wide text-primary-foreground uppercase transition-colors hover:bg-primary/90 sm:px-5"
     >
       Dashboard
     </Link>
@@ -48,13 +48,13 @@ export function Navbar() {
     <>
       <Link
         href="/login"
-        className="text-sm font-bold tracking-wide text-white uppercase transition-colors hover:text-orange-500"
+        className="text-sm font-bold tracking-wide text-foreground uppercase transition-colors hover:text-primary"
       >
         Login
       </Link>
       <Link
         href="/signup"
-        className="bg-orange-500 px-4 py-2 text-sm font-bold tracking-wide text-black uppercase transition-colors hover:bg-orange-400 sm:px-5"
+        className="bg-primary px-4 py-2 text-sm font-bold tracking-wide text-primary-foreground uppercase transition-colors hover:bg-primary/90 sm:px-5"
       >
         Get Started
       </Link>
@@ -62,11 +62,11 @@ export function Navbar() {
   )
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
+    <header className="fixed top-0 right-0 left-0 z-50 border-b border-border/10 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="font-black text-xl tracking-tight text-orange-500 uppercase"
+          className="font-heading text-xl tracking-tight text-primary uppercase"
         >
           DataAI
         </Link>
@@ -81,7 +81,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={scrollToHowItWorks}
-              className="text-sm font-bold tracking-wide text-white/80 uppercase transition-colors hover:text-white"
+              className="text-sm font-bold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
             >
               How It Works
             </button>
@@ -91,7 +91,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center border border-white/10 text-white transition-colors hover:border-orange-500 hover:text-orange-500 md:hidden"
+          className="flex h-10 w-10 items-center justify-center border border-border text-foreground transition-colors hover:border-primary hover:text-primary md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
@@ -101,14 +101,14 @@ export function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="border-t border-white/10 bg-black/95 px-4 py-4 backdrop-blur-md md:hidden">
+        <div className="border-t border-border/10 bg-background/95 px-4 py-4 backdrop-blur-md md:hidden">
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={`py-2 text-sm font-bold tracking-wide uppercase ${
-                  pathname === link.href ? 'text-orange-500' : 'text-white'
+                  pathname === link.href ? 'text-primary' : 'text-foreground'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -119,7 +119,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={scrollToHowItWorks}
-                className="py-2 text-left text-sm font-bold tracking-wide text-white uppercase"
+                className="py-2 text-left text-sm font-bold tracking-wide text-foreground uppercase"
               >
                 How It Works
               </button>
@@ -127,7 +127,7 @@ export function Navbar() {
             {loggedIn ? (
               <Link
                 href="/dashboard"
-                className="bg-orange-500 px-4 py-3 text-center text-sm font-bold tracking-wide text-black uppercase"
+                className="bg-primary px-4 py-3 text-center text-sm font-bold tracking-wide text-primary-foreground uppercase"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dashboard
@@ -136,14 +136,14 @@ export function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="py-2 text-sm font-bold tracking-wide text-white uppercase"
+                  className="py-2 text-sm font-bold tracking-wide text-foreground uppercase"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
-                  className="bg-orange-500 px-4 py-3 text-center text-sm font-bold tracking-wide text-black uppercase"
+                  className="bg-primary px-4 py-3 text-center text-sm font-bold tracking-wide text-primary-foreground uppercase"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Get Started
