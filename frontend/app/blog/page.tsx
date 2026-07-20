@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import AnimateOnScroll from '@/components/animate-on-scroll'
+import { AnimateOnScroll } from '@/components/animate-on-scroll'
 import Link from 'next/link'
 
 interface Post {
